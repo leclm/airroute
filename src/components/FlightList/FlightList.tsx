@@ -3,8 +3,10 @@ import { getFlights, type Flight } from "../../services/flightService";
 
 export default function FlightList({
   selectedAircraft,
+  selectedDate,
 }: {
   selectedAircraft: string | null;
+  selectedDate: string;
 }) {
   const [flights, setFlights] = useState<Flight[]>([]);
   const [rotation, setRotation] = useState<Flight[]>([]);
@@ -60,8 +62,9 @@ export default function FlightList({
     if (!selectedAircraft) return;
     const raw = localStorage.getItem("rotation-by-aircraft");
     const data = raw ? JSON.parse(raw) : {};
-    const saved = data[selectedAircraft] || [];
+    const saved = data[selectedAircraft]?.[selectedDate] || [];
     setRotation(saved);
+
     getFlights()
       .then((all) => {
         const filtered = all.filter(
@@ -86,11 +89,22 @@ export default function FlightList({
   function handleFlightClick(flight: Flight) {
     if (!selectedAircraft) return;
     if (!canAddFlight(rotation, flight)) return;
-    const newRotation = [...rotation, flight];
+
     const raw = localStorage.getItem("rotation-by-aircraft");
     const data = raw ? JSON.parse(raw) : {};
-    data[selectedAircraft] = newRotation;
+
+    if (!data[selectedAircraft]) {
+      data[selectedAircraft] = {};
+    }
+
+    const currentRotation: Flight[] =
+      data[selectedAircraft][selectedDate] || [];
+
+    const newRotation = [...currentRotation, flight];
+    data[selectedAircraft][selectedDate] = newRotation;
+
     localStorage.setItem("rotation-by-aircraft", JSON.stringify(data));
+
     setRotation(newRotation);
     setFlights((prev) => prev.filter((f) => f.ident !== flight.ident));
     window.dispatchEvent(
