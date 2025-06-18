@@ -1,17 +1,62 @@
+import { useState, useEffect } from "react";
+import dayjs from "dayjs";
 import AircraftList from "./components/AircraftList/AircraftList";
 import FlightList from "./components/FlightList/FlightList";
 import Rotation from "./components/Rotation/Rotation";
-import { useState } from "react";
-import dayjs from "dayjs";
+import AircraftTimeline from "./components/AircraftTimeline/AircraftTimeline";
+
+interface Flight {
+  ident: string;
+  origin: string;
+  destination: string;
+  readable_departure: string;
+  readable_arrival: string;
+}
 
 function App() {
   const [selectedAircraft, setSelectedAircraft] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>(
     dayjs().format("YYYY-MM-DD")
   );
+  const [flightsForSelectedAircraft, setFlightsForSelectedAircraft] = useState<
+    Flight[]
+  >([]);
+
+  useEffect(() => {
+    if (!selectedAircraft) {
+      setFlightsForSelectedAircraft([]);
+      return;
+    }
+
+    const raw = localStorage.getItem("rotation-by-aircraft");
+    const all = raw ? JSON.parse(raw) : {};
+    const flights: Flight[] = all[selectedAircraft]?.[selectedDate] || [];
+    setFlightsForSelectedAircraft(flights);
+  }, [selectedAircraft, selectedDate]);
+
+  useEffect(() => {
+    function reloadFlights() {
+      if (!selectedAircraft) {
+        setFlightsForSelectedAircraft([]);
+        return;
+      }
+      const raw = localStorage.getItem("rotation-by-aircraft");
+      const all = raw ? JSON.parse(raw) : {};
+      const flights: Flight[] = all[selectedAircraft]?.[selectedDate] || [];
+      setFlightsForSelectedAircraft(flights);
+    }
+
+    window.addEventListener("flight-added", reloadFlights);
+    window.addEventListener("flight-removed", reloadFlights);
+
+    return () => {
+      window.removeEventListener("flight-added", reloadFlights);
+      window.removeEventListener("flight-removed", reloadFlights);
+    };
+  }, [selectedAircraft, selectedDate]);
 
   return (
-    <div className="bg-gradient-to-r from-gray-800 via-gray-900 to-black shadow-xl mb-6 p-10 border border-gray-700 text-left">
+    <div className="min-h-screen bg-gradient-to-r from-gray-800 via-gray-900 to-black shadow-xl p-10 border border-gray-700 text-left flex flex-col">
       <h1 className="text-2xl text-center font-bold text-white mb-6">
         AirRoute
       </h1>
@@ -29,6 +74,7 @@ function App() {
         <AircraftList
           onSelect={setSelectedAircraft}
           selected={selectedAircraft}
+          selectedDate={selectedDate}
         />
         <Rotation
           selectedAircraft={selectedAircraft}
@@ -39,13 +85,7 @@ function App() {
           selectedDate={selectedDate}
         />
       </main>
-
-      <h1 className="text-2xl text-center font-bold text-white mb-6">
-        AirRoute
-        <br />
-        AirRoute
-        <br />
-      </h1>
+      <AircraftTimeline flights={flightsForSelectedAircraft} />
     </div>
   );
 }

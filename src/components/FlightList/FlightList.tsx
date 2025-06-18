@@ -84,7 +84,7 @@ export default function FlightList({
       window.removeEventListener("flight-removed", loadRotation);
       window.removeEventListener("flight-added", loadRotation);
     };
-  }, [selectedAircraft]);
+  }, [selectedAircraft, selectedDate]);
 
   function handleFlightClick(flight: Flight) {
     if (!selectedAircraft) return;
@@ -116,12 +116,12 @@ export default function FlightList({
     return <p className="text-red-400 text-center text-lg">Error: {error}</p>;
 
   return (
-    <div className="bg-white/10 border border-gray-700 p-6 rounded-2xl shadow-xl w-full max-w-4xl mx-auto max-h-[70vh]">
+    <div className="bg-white/10 border border-gray-700 p-6 rounded-2xl shadow-xl w-full max-w-4xl mx-auto max-h-[60vh]">
       <h2 className="text-2xl font-bold text-white mb-6">Flights</h2>
       {loading ? (
         <p className="text-white text-center text-lg">Select an aircraft</p>
       ) : (
-        <div className="overflow-y-auto max-h-[calc(70vh-8rem)] pr-2 space-y-4">
+        <div className="overflow-y-auto max-h-[calc(60vh-8rem)] pr-2 space-y-4">
           {flights.map((flight) => (
             <div
               key={flight.ident}

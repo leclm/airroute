@@ -8,7 +8,6 @@ export interface Aircraft {
   base: string;
 }
 
-
 export async function getAircrafts(): Promise<Aircraft[]> {
   return await apiFetch<Aircraft[]>('/aircrafts');
 }

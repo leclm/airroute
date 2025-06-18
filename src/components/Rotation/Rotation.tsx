@@ -55,14 +55,14 @@ export default function Rotation({ selectedAircraft, selectedDate }: Props) {
   };
 
   return (
-    <div className="bg-white/10 border border-gray-700 p-6 rounded-2xl shadow-xl w-full max-w-4xl mx-auto max-h-[70vh]">
+    <div className="bg-white/10 border border-gray-700 p-6 rounded-2xl shadow-xl w-full max-w-4xl mx-auto max-h-[60vh]">
       <h2 className="text-2xl font-bold text-white mb-6">
         Rotation - {selectedAircraft || ""}
       </h2>
       {rotation.length === 0 ? (
         <p className="text-white text-center text-lg">No flights registered.</p>
       ) : (
-        <div className="overflow-y-auto max-h-[calc(70vh-8rem)] pr-2 space-y-4">
+        <div className="overflow-y-auto max-h-[calc(60vh-8rem)] pr-2 space-y-4">
           {rotation.map((flight) => (
             <div
               key={flight.ident}
